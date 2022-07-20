@@ -1,21 +1,15 @@
 package nonempty
 
-import "errors"
-
 type NonEmpty[A any] struct {
 	head A
 	tail []A
 }
 
-func NewNonEmpty[A any](slice []A) (NonEmpty[A], error) {
-	if len(slice) == 0 {
-		return NonEmpty[A]{}, errors.New("empty slice")
-	}
-
+func NewNonEmpty[A any](a A, slice []A) NonEmpty[A] {
 	return NonEmpty[A]{
-		head: slice[0],
-		tail: slice[1:],
-	}, nil
+		head: a,
+		tail: slice,
+	}
 }
 
 func (ne NonEmpty[_]) Length() int {

@@ -8,11 +8,13 @@ import (
 
 type Build struct {
 	pipeline Pipeline
+	state    BuildState
 }
 
 func NewBuild(pipeline Pipeline) Build {
 	return Build{
 		pipeline: pipeline,
+		state:    BuildReady,
 	}
 }
 
@@ -43,14 +45,10 @@ type Pipeline struct {
 	steps nonempty.NonEmpty[Step]
 }
 
-func NewPipeline(steps []Step) (Pipeline, error) {
-	s, err := nonempty.NewNonEmpty(steps)
-	if err != nil {
-		return Pipeline{}, errors.New("no steps provided")
-	}
+func NewPipeline(steps nonempty.NonEmpty[Step]) Pipeline {
 	return Pipeline{
-		steps: s,
-	}, nil
+		steps: steps,
+	}
 }
 
 type Step struct {
@@ -59,18 +57,14 @@ type Step struct {
 	commands nonempty.NonEmpty[string]
 }
 
-func NewStep(name, image string, commands []string) (Step, error) {
+func NewStep(name, image string, commands nonempty.NonEmpty[string]) (Step, error) {
 	if image == "" || name == "" {
 		return Step{}, errors.New("empty argument")
 	}
 
-	c, err := nonempty.NewNonEmpty(commands)
-	if err != nil {
-		return Step{}, errors.New("no commands provided")
-	}
 	return Step{
 		name:     name,
 		image:    image,
-		commands: c,
+		commands: commands,
 	}, nil
 }
